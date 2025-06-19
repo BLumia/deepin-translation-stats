@@ -18,7 +18,7 @@ uv run stats.py packages.txt [--source-dir 源码存储目录] [--languages 语�
 
 - `packages.txt`: 包名列表文件，每行一个包名
 - `--source-dir`: 可选参数，指定源码存储目录。默认使用当前工作目录下的 `pkg-sources` 子目录
-- `--languages`: 可选参数，指定要统计的语言列表，用逗号分隔。默认为 `zh_HK,zh_TW`
+- `--languages`: 可选参数，指定要统计的语言列表，用逗号分隔。默认为中文的几个地区变体
 
 ### 工作流程
 
@@ -26,14 +26,16 @@ uv run stats.py packages.txt [--source-dir 源码存储目录] [--languages 语�
 2. 对每个包使用 `apt source` 下载源码到指定目录
 3. 如果源码目录已存在，则跳过下载步骤
 4. 对每个源码包执行 `deepin-translation-utils stats` 命令
-5. 过滤输出中包含指定语言的行（默认为 `zh_HK` 或 `zh_TW`）
+5. 过滤输出中包含指定语言的行
 6. 按指定格式输出结果到标准输出
 
 ## 依赖要求
 
 - 系统环境：Deepin/Debian 或其他支持 `apt source` 的系统
-- 必需工具：`deepin-translation-utils` 命令行工具
+- 必需工具：`deepin-translation-utils` 命令行工具（版本 >= 0.4.0）
 - Python版本：>=3.12
+
+**注意**：从 deepin-translation-utils 0.4.0 版本开始，工具支持 `-l` 参数来指定统计的语言列表，可以显著提高统计速度。本工具会自动检查版本并使用此优化特性。
 
 ## 错误处理
 
@@ -54,7 +56,7 @@ python stats.py packages.txt --source-dir /tmp/sources
 python stats.py packages.txt --languages zh_CN,zh_TW
 
 # 指定多种语言
-python stats.py packages.txt --languages zh_HK,zh_TW,zh_CN,ja_JP
+python stats.py packages.txt --languages zh_HK,zh_TW,zh_CN,ja
 
 # 组合使用多个参数
 python stats.py packages.txt --source-dir /tmp/sources --languages zh_CN,zh_TW
@@ -67,7 +69,7 @@ python stats.py packages.txt --source-dir /tmp/sources --languages zh_CN,zh_TW
 ```plain
 包名1:
 
-deepin-translation-utils提供的输出中，包含 zh_HK 或 zh_TW 的行的原样内容。
+deepin-translation-utils提供的输出中，包含给定语言代码的行的原样内容。
 
 包名2:
 

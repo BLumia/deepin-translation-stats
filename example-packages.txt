@@ -1,5 +1,7 @@
 # 示例包名列表
 # 每行一个包名，以 # 开头的行将被忽略
+# 可参照此方式获取列表：
+# apt list --installed | cut -d'/' -f1 | uniq | grep deepin
 
 # DDE 相关包
 # 注：所注释的项目不包含翻译
@@ -10,3 +12,19 @@ dde-launchpad
 # dde-application-manager
 deepin-update-ui
 dde-daemon
+dde-network-core
+dde-session-shell
+dde-session-ui
+
+# 应用项目
+dde-file-manager
+dde-grand-search
+deepin-calculator
+deepin-draw
+deepin-diskmanager
+deepin-editor
+deepin-home
+deepin-image-viewer
+deepin-log-viewer
+deepin-screen-recorder
+deepin-terminal
