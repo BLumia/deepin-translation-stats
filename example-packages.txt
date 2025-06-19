@@ -1,0 +1,12 @@
+# 示例包名列表
+# 每行一个包名，以 # 开头的行将被忽略
+
+# DDE 相关包
+# 注：所注释的项目不包含翻译
+dde-control-center
+dde-shell
+dde-tray-loader
+dde-launchpad
+# dde-application-manager
+deepin-update-ui
+dde-daemon
