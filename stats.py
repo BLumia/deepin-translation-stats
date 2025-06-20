@@ -90,15 +90,44 @@ def download_source_package(package_name: str, source_dir: Path) -> Tuple[bool, 
         return False, f"下载异常: {str(e)}"
 
 
-def find_source_directory(package_name: str, source_dir: Path) -> str:
-    """查找软件包的源码目录"""
+def find_source_directory(package_name: str, source_dir: Path) -> Tuple[str, str]:
+    """查找软件包的源码目录，并从目录名解析版本号"""
     # 查找以包名开头的目录
     matching_dirs = [path for path in source_dir.glob(f"{package_name}*") if path.is_dir()]
     if not matching_dirs:
-        return ""
+        return "", "未知版本"
 
     # 选择第一个匹配的目录
-    return str(matching_dirs[0])
+    source_dir_path = str(matching_dirs[0])
+    
+    # 从目录名解析版本号
+    dir_name = matching_dirs[0].name
+    
+    # 通常格式为 package-name-version
+    if '-' in dir_name:
+        parts = dir_name.split('-')
+        # 查找看起来像版本号的部分（包含数字和点）
+        for i in range(1, len(parts)):
+            potential_version = '-'.join(parts[i:])
+            if re.search(r'\d+\.\d+', potential_version):
+                # 检查这个版本号是否以包名结尾，如果是则移除
+                if potential_version.endswith(package_name):
+                    # 移除包名部分，只保留版本号
+                    version_only = potential_version[:-len(package_name)].rstrip('-')
+                    if version_only:
+                        return source_dir_path, version_only
+                else:
+                    return source_dir_path, potential_version
+    
+    # 如果无法从目录名推断版本，尝试其他方法
+    # 有些包的目录名可能是 package_name.orig 或其他格式
+    if '.' in dir_name:
+        # 移除包名部分，看剩余部分是否包含版本信息
+        remaining = dir_name.replace(package_name, '', 1).lstrip('-_.')
+        if remaining and re.search(r'\d+', remaining):
+            return source_dir_path, remaining
+    
+    return source_dir_path, "未知版本"
 
 
 def get_translation_stats(source_path: str, languages: List[str]) -> Tuple[bool, str]:
@@ -139,22 +168,27 @@ def filter_translation_lines(output: str, languages: List[str]) -> str:
 
 def process_package(package_name: str, source_dir: Path, languages: List[str]) -> None:
     """处理单个软件包"""
-    print(f"## {package_name}:")
-    print()
-
     # 下载源码
     success, message = download_source_package(package_name, source_dir)
     if not success:
+        print(f"## {package_name} (未知版本):")
+        print()
         print(message)
         print()
         return
 
-    # 查找源码目录
-    source_path = find_source_directory(package_name, source_dir)
+    # 查找源码目录并获取版本信息
+    source_path, version = find_source_directory(package_name, source_dir)
     if not source_path:
+        print(f"## {package_name} (未知版本):")
+        print()
         print(f"错误: 未找到包 {package_name} 的源码目录")
         print()
         return
+    
+    # 显示包名和从源码解析的版本
+    print(f"## {package_name} ({version}):")
+    print()
 
     # 获取翻译统计
     success, output = get_translation_stats(source_path, languages)

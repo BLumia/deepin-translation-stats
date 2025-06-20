@@ -1,6 +1,6 @@
 # 翻译完成度统计工具
 
-此工具接受一个文本文件路径作为参数，会读取指向文件所给定的包名列表（每行一个），使用 `apt source` 获取其对应的源码，然后针对每个获取到源码的包，依次使用 `deepin-translation-utils` 命令行工具的 `deepin-translation-utils stats path/to/source/root/` 命令的标准输出获取翻译完成情况，取其包含 `zh_HK` 与 `zh_TW` 的行进行输出。
+此工具接受一个文本文件路径作为参数，会读取指向文件所给定的包名列表（每行一个），使用 `apt source` 获取其对应的源码，然后针对每个获取到源码的包，依次使用 `deepin-translation-utils` 命令行工具的 `deepin-translation-utils stats path/to/source/root/` 命令的标准输出获取翻译完成情况，最终展示各个包的翻译完成度统计。
 
 ## 使用方法
 
@@ -25,7 +25,7 @@ uv run stats.py packages.txt [--source-dir 源码存储目录] [--languages 语�
 1. 读取包名列表文件
 2. 对每个包使用 `apt source` 下载源码到指定目录
 3. 如果源码目录已存在，则跳过下载步骤
-4. 对每个源码包执行 `deepin-translation-utils stats` 命令
+4. 对每个源码包执行 `deepin-translation-utils stats` 命令（会通过 `-l` 参数指定语言列表）
 5. 过滤输出中包含指定语言的行
 6. 按指定格式输出结果到标准输出
 
@@ -67,11 +67,16 @@ python stats.py packages.txt --source-dir /tmp/sources --languages zh_CN,zh_TW
 假定`包名1`可以正常得到结果，`包名2`出错，则格式如下：
 
 ```plain
-包名1:
+## 包名1 (1.2.3-1):
 
 deepin-translation-utils提供的输出中，包含给定语言代码的行的原样内容。
 
-包名2:
+## 包名2 (2.0.1-2):
 
 错误原因
 ```
+
+输出格式说明：
+- 每个包的标题行显示为 `## 包名 (版本号):`
+- 版本号从下载的源码目录名解析获得，如果解析失败则显示 "未知版本"
+- 支持解析常见的源码目录命名格式，如 `package-name-version` 等
